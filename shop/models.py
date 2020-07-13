@@ -6,11 +6,11 @@ from django.db.models import Sum
 from django.shortcuts import reverse
 
 CATEGORY_CHOICES = (
-    ('ЗИМА','Зима')
-    ('ДЕМИСЕЗОН','Демисезон')
-    ('УСТАВНЫЕ','Уставные')
-    ('КЛАССИКА','Классика')
-    ('ЛЕТО','Лето')
+    ('З','Зима'),
+    ('Д','Демисезон'),
+    ('У','Уставные'),
+    ('К','Классика'),
+    ('Л','Лето'),
 )
 
 
@@ -22,6 +22,13 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.username
+
+
+class ShoeSize(models.Model):
+    rusSize = models.FloatField(("Размер RU"), max_length=10, help_text="Выберите все размеры для модели")
+
+    def __str__(self):
+        return self.rusSize
 
 
 class Product(models.Model):
@@ -38,15 +45,15 @@ class Product(models.Model):
     image4          = models.ImageField(("Картинка4"), blank=True, null=True)
     weight          = models.IntegerField(("Вес"),)
 
-    dimensions      = models.CharField(("Размеры"),)
-    topMaterial     = models.CharField(("Материал верха"),)
-    liningMaterial  = models.CharField(("Название модели"),)
-    soleMaterial    = models.CharField(("Название модели"),)
-    color           = models.CharField(("Цвет"),)
-    clasp           = models.CharField(("Застежка"),)
-    insole          = models.CharField("Стелька")
-    outsoleMount    = models.CharField("Крепление подошвы")
-    height          = models.CharField("Высота")
+    dimensions      = models.CharField(("Размеры"), max_length=256)
+    topMaterial     = models.CharField(("Материал верха"), max_length=256)
+    liningMaterial  = models.CharField(("Название модели"), max_length=256)
+    soleMaterial    = models.CharField(("Название модели"), max_length=256)
+    color           = models.CharField(("Цвет"), max_length=256)
+    clasp           = models.CharField(("Застежка"), max_length=256)
+    insole          = models.CharField(("Стелька"), max_length=256)
+    outsoleMount    = models.CharField(("Крепление подошвы"), max_length=256)
+    height          = models.CharField(("Высота"), max_length=256)
     rusSize         = models.ManyToManyField(ShoeSize, related_name="sizes", blank=True)
 
     def __str__(self):
@@ -67,13 +74,6 @@ class Product(models.Model):
             'slug': self.slug
         })
     
-    
-class ShoeSize(models.Model):
-    rusSize = models.FloatField(("Размер RU"),verbose_name=u"Shoe Size", max_length=10, help_text="Выберите все размеры для модели")
-
-    def __str__(self):
-        return self.rusSize
-
 
 class OrderItem(models.Model):
     user        = models.ForeignKey(settings.AUTH_USER_MODEL,
@@ -120,7 +120,7 @@ class Order(models.Model):
     user                = models.ForeignKey(settings.AUTH_USER_MODEL, 
                             on_delete=models.CASCADE)
     items               = models.ManyToManyField(OrderItem)
-    shipping_address    = models.ManyToManyField()
+    shipping_address    = models.ManyToManyField(Address)
     shipped             = models.BooleanField(default=False)
 
     created_at          = models.DateTimeField(auto_now_add=True)
